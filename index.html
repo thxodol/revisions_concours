@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Données - Officier</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-light: #ffffff;
+            --accent: #60a5fa;
+            --bg-dark: #0a192f;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-light);
+            background-color: var(--bg-dark);
+            overflow-x: hidden;
+        }
+
+        /* ----- ÉCRAN DE CONNEXION PREMIUM ----- */
+        #login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: url('fond.png') no-repeat center center;
+            background-size: cover;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        #login-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 25, 47, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 0;
+        }
+
+        .login-box {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            width: 90%;
+            max-width: 380px;
+        }
+
+        .login-logo {
+            max-width: 130px;
+            height: auto;
+            margin: 0 auto 20px auto;
+            display: block;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+        }
+
+        .login-box h2 {
+            margin-top: 0;
+            letter-spacing: 2px;
+            font-size: 1.4rem;
+            text-transform: uppercase;
+        }
+
+        .login-box p {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        #password-input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+            letter-spacing: 2px;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #password-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        #login-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #login-btn:hover {
+            background: #3b82f6;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.5);
+        }
+
+        #login-error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 15px;
+            font-weight: 500;
+            display: none;
+        }
+
+        /* ----- STRUCTURE PRINCIPALE ----- */
+        #main-app {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease;
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        header { text-align: center; margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px; }
+        header h1 { font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin: 0; }
+
+        .dashboard-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-layout { flex-direction: row; align-items: flex-start; }
+        }
+
+        /* ----- BARRE LATÉRALE ----- */
+        .category-sidebar {
+            display: flex;
+            flex-direction: row;
+            overflow-x: auto;
+            gap: 15px;
+            padding-bottom: 15px;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .category-sidebar {
+                flex-direction: column;
+                width: 280px;
+                flex-shrink: 0;
+                overflow-x: visible;
+                padding-bottom: 0;
+                position: sticky;
+                top: 20px;
+            }
+        }
+
+        .category-sidebar::-webkit-scrollbar { display: none; }
+
+        .category-card {
+            flex: 0 0 auto;
+            width: 220px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        @media (min-width: 768px) {
+            .category-card { width: 100%; box-sizing: border-box; }
+        }
+
+        .category-card:hover {
+            transform: translateX(8px);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 10px 10px 20px -10px rgba(0, 0, 0, 0.4);
+        }
+
+        .category-card.active {
+            background: linear-gradient(90deg, rgba(96, 165, 250, 0.15), transparent);
+            border-color: var(--glass-border);
+            border-left: 4px solid var(--accent);
+        }
+
+        .category-card h3 { margin: 0 0 8px 0; font-size: 1.1rem; color: var(--text-light); }
+        .category-card p { margin: 0; font-size: 0.8rem; color: #94a3b8; line-height: 1.4; }
+
+        /* ----- ZONE DE CONTENU ----- */
+        .content-area { flex-grow: 1; width: 100%; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ----- SOUS-NAVIGATION (Pills) ----- */
+        .sub-nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            scrollbar-width: none; 
+        }
+        .sub-nav::-webkit-scrollbar { display: none; }
+
+        .sub-tab-button {
+            padding: 8px 20px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .sub-tab-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .sub-tab-button.active {
+            background: var(--accent);
+            color: #0f172a;
+            font-weight: 600;
+            border-color: var(--accent);
+            box-shadow: 0 4px 10px rgba(96, 165, 250, 0.3);
+        }
+
+        .sub-tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .sub-tab-content.active { display: block; }
+
+        /* ----- FLASHCARDS ----- */
+        .flashcard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .flashcard { height: 180px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .card-front, .card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; border-radius: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); text-align: center; }
+        .card-back { transform: rotateY(180deg); background: rgba(96, 165, 250, 0.1); border-color: rgba(96, 165, 250, 0.3); color: var(--accent); }
+
+        /* ----- RAPPORTS LONGS (Articles) ----- */
+        .article-container {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 30px;
+            line-height: 1.7;
+            color: #cbd5e1;
+        }
+
+        .article-image {
+            width: 100%;
+            max-height: 450px; /* On donne plus de hauteur pour la carte */
+            object-fit: contain; /* C'est le secret : l'image s'adapte sans être coupée */
+            background-color: rgba(0, 0, 0, 0.15); /* Ajoute un fond discret si l'image ne prend pas toute la largeur */
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+            border: 1px solid var(--glass-border);
+        }
+
+        .article-title {
+            color: var(--accent);
+            font-size: 1.25rem;
+            border-bottom: 1px solid rgba(96, 165, 250, 0.2);
+            padding-bottom: 10px;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .article-title:first-of-type { margin-top: 0; }
+        .article-container p { margin-bottom: 18px; font-size: 0.95rem; text-align: justify; }
+        .article-container strong { color: #ffffff; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <!-- ÉCRAN DE VERROUILLAGE -->
+    <div id="login-overlay">
+        <div class="login-box">
+            <img src="logo_EPA.png" alt="Logo École des pupilles de l'air" class="login-logo">
+            <h2>Accès Restreint</h2>
+            <p>Portail de révision tactique et stratégique. Identification requise.</p>
+            <input type="password" id="password-input" placeholder="Clé d'accès" onkeypress="handleEnter(event)">
+            <button id="login-btn" onclick="checkPassword()">Connexion</button>
+            <div id="login-error">Accès refusé. Clé incorrecte.</div>
+        </div>
+    </div>
+
+    <!-- CONTENU PRINCIPAL DU SITE -->
+    <div id="main-app">
+        <header>
+            <h1>Dossier Stratégique</h1>
+        </header>
+
+        <div class="dashboard-layout">
+            
+            <!-- MENU LATÉRAL GAUCHE -->
+            <div class="category-sidebar">
+                <div class="category-card active" onclick="switchTab(event, 'geopolitique')">
+                    <h3>Géopolitique</h3>
+                    <p>Enjeux, conflits et alliances mondiales.</p>
+                </div>
+                <div class="category-card" onclick="switchTab(event, 'histoire')">
+                    <h3>Histoire</h3>
+                    <p>Mémoire, batailles et opérations majeures.</p>
+                </div>
+                <div class="category-card" onclick="switchTab(event, 'culture-gen')">
+                    <h3>Culture Générale</h3>
+                    <p>Société, concepts et institutions.</p>
+                </div>
+                <div class="category-card" onclick="switchTab(event, 'armee-air')">
+                    <h3>Culture AAE</h3>
+                    <p>Aéronautique, espace et bases aériennes.</p>
+                </div>
+                <div class="category-card" onclick="switchTab(event, 'esm')">
+                    <h3>ESM Saint-Cyr</h3>
+                    <p>Culture Armée de Terre et commandement.</p>
+                </div>
+            </div>
+
+            <!-- CONTENU DE DROITE -->
+            <div class="content-area">
+                
+                <!-- GÉOPOLITIQUE -->
+                <div id="geopolitique" class="tab-content active">
+                    <h2>Géopolitique</h2>
+                    
+                    <div class="sub-nav">
+                        <button class="sub-tab-button active" onclick="switchSubTab(event, 'geo-ukraine')">Russie / Ukraine</button>
+                        <button class="sub-tab-button" onclick="switchSubTab(event, 'geo-israel')">Israël / Palestine</button>
+                        <button class="sub-tab-button" onclick="switchSubTab(event, 'geo-iran')">Iran / USA / Israël</button>
+<button class="sub-tab-button" onclick="switchSubTab(event, 'geo-mali')">Mali & Sahel</button>
+                    </div>
+
+                    <div id="geo-ukraine" class="sub-tab-content active">
+                        <div class="article-container">
+                            <!-- Image d'en-tête -->
+                            <img src="carte_ukraine.png" alt="Carte Géopolitique Ukraine" class="article-image">
+
+                            <h3 class="article-title">I. Les origines de la fracture (1991 - 2014)</h3>
+                            <p><strong>L'Indépendance et le Mémorandum de Budapest (1994) :</strong> À la chute de l'URSS, l'Ukraine devient indépendante et hérite du 3e arsenal nucléaire mondial. En 1994, elle accepte de restituer ces armes à la Russie en échange de la garantie (signée par Moscou, Washington et Londres) du respect de ses frontières et de son intégrité territoriale.</p>
+                            <p><strong>La Révolution de Maïdan (2013-2014) :</strong> Le président ukrainien prorusse Viktor Ianoukovytch refuse de signer un accord d'association avec l'Union Européenne sous la pression de Moscou. Des manifestations massives pro-européennes éclatent à Kiev, menant à la fuite du président en Russie.</p>
+                            <p><strong>L'annexion de la Crimée et le Donbass (2014) :</strong> En représailles, la Russie déploie des "petits hommes verts" (forces spéciales sans insigne) pour annexer la péninsule stratégique de Crimée (qui abrite la flotte russe de la mer Noire à Sébastopol). Dans le même temps, Moscou déclenche et soutient militairement une guerre séparatiste dans la région industrielle du Donbass à l'est de l'Ukraine (Guerre hybride).</p>
+
+                            <h3 class="article-title">II. L'invasion à grande échelle et l'échec de la guerre éclair (2022)</h3>
+                            <p><strong>Le 24 février 2022 :</strong> Vladimir Poutine lance une "Opération Militaire Spéciale" visant à décapiter le gouvernement ukrainien ("dénazification et démilitarisation"). L'offensive est lancée sur plusieurs fronts (Nord vers Kiev, Est, et Sud depuis la Crimée).</p>
+                            <p><strong>La résistance et le tournant de l'automne :</strong> L'armée russe échoue à prendre Kiev (échec de l'assaut aéroporté sur l'aéroport de Hostomel) face à une résistance ukrainienne farouche menée par Volodymyr Zelensky. À l'automne 2022, l'Ukraine lance deux contre-offensives foudroyantes, reprenant la région de Kharkiv au nord-est et la ville de Kherson au sud.</p>
+
+                            <h3 class="article-title">III. Le retour de la guerre d'attrition et de haute intensité (2023 - 2024)</h3>
+                            <p><strong>La guerre de position :</strong> Le conflit se fige. La Russie met en place la "Ligne Sourovikine" (un réseau de défense en profondeur colossal avec champs de mines, dents de dragon et tranchées) qui brise la contre-offensive ukrainienne de l'été 2023. Le conflit ressemble désormais à la Première Guerre mondiale, dominé par l'artillerie.</p>
+                            <p><strong>L'innovation tactique et la guerre des drones :</strong> Ce conflit marque une révolution militaire. On observe une utilisation massive de drones FPV (First Person View) modifiés avec des explosifs pour détruire des blindés, de munitions rôdeuses (Shahed iraniens), et une omniprésence de la guerre électronique (brouillage). En mer Noire, l'Ukraine (bien que n'ayant quasiment plus de marine) réussit à repousser la flotte russe grâce à des drones navals de surface (USV).</p>
+
+                            <h3 class="article-title">IV. Économie de guerre et internationalisation du conflit (2025 - 2026)</h3>
+                            <p><strong>Le défi logistique et industriel :</strong> Le conflit se transforme en une guerre d'usure (attrition) où la capacité à produire des obus et des missiles est décisive. La Russie bascule officiellement en économie de guerre et s'appuie sur de nouveaux partenaires (livraisons massives de munitions par la Corée du Nord, drones d'Iran, soutien technologique de la Chine).</p>
+                            <p><strong>L'impasse stratégique actuelle :</strong> L'Ukraine, dépendante de l'aide militaire occidentale, mène une stratégie de défense active pour maximiser les pertes russes tout en préservant ses effectifs. Le conflit souligne l'urgence pour l'Europe de réarmer et de rebâtir une base industrielle et technologique de défense (BITD) capable de soutenir un effort de guerre de haute intensité sur le long terme.</p>
+                        </div>
+                    </div>
+
+                    <div id="geo-israel" class="sub-tab-content">
+                        <div class="article-container">
+                            <!-- Image d'en-tête -->
+                            <img src="carte_palestine.png" alt="Carte Historique Israël Palestine" class="article-image">
+
+                            <h3 class="article-title">I. Les racines du conflit et la création d'Israël (Fin XIXe - 1948)</h3>
+                            <p><strong>Le Sionisme et le Mandat britannique :</strong> À la fin du XIXe siècle naît le sionisme (projet de création d'un foyer national juif en Palestine, alors sous empire Ottoman). En 1917, par la <em>Déclaration Balfour</em>, le Royaume-Uni (qui obtient le mandat sur la Palestine après la 1ère GM) soutient ce projet. Les tensions entre populations juives immigrées et arabes autochtones s'intensifient.</p>
+                            <p><strong>Le Plan de partage de l'ONU (1947) :</strong> Suite à la Shoah, l'ONU vote la Résolution 181 : la partition de la Palestine en un État juif, un État arabe, et Jérusalem sous contrôle international. Les dirigeants juifs acceptent, les dirigeants arabes refusent catégoriquement.</p>
+                            <p><strong>La Création d'Israël et la Première Guerre (1948) :</strong> David Ben Gourion proclame l'État d'Israël (14 mai 1948). Les armées arabes voisines attaquent immédiatement. Israël remporte cette guerre, agrandit son territoire. Pour les Palestiniens, c'est la <em>Nakba</em> (la "Catastrophe") : l'exode de plus de 700 000 réfugiés.</p>
+
+                            <h3 class="article-title">II. L'ère des grandes guerres interétatiques (1967 - 1973)</h3>
+                            <p><strong>La Guerre des Six Jours (1967) :</strong> Victoire éclair et écrasante d'Israël contre l'Égypte, la Syrie et la Jordanie. Israël occupe le Sinaï, la bande de Gaza, la Cisjordanie, Jérusalem-Est et le plateau du Golan. L'ONU vote la Résolution 242 exigeant le retrait des territoires occupés en échange de la paix, posant le cadre juridique du conflit moderne.</p>
+                            <p><strong>La Guerre du Kippour (1973) :</strong> Attaque surprise de l'Égypte et de la Syrie. Israël repousse l'offensive mais subit un choc psychologique majeur. Cela ouvre la voie au réalisme politique : l'Égypte signe la paix avec Israël en 1978 (Accords de Camp David), récupérant le Sinaï et devenant le premier pays arabe à reconnaître Israël.</p>
+
+                            <h3 class="article-title">III. OLP, Intifadas et l'Espoir d'Oslo (1987 - 2005)</h3>
+                            <p><strong>La Première Intifada et l'émergence du Hamas (1987) :</strong> Soulèvement populaire palestinien ("Guerre des pierres") dans les territoires occupés contre l'armée israélienne. C'est à ce moment qu'est créé le Hamas, mouvement islamiste qui refuse l'existence même d'Israël, s'opposant au Fatah (laïc) de Yasser Arafat (dirigeant de l'OLP).</p>
+                            <p><strong>Les Accords d'Oslo (1993) :</strong> Poignée de main historique entre Yitzhak Rabin et Yasser Arafat. Création de l'Autorité palestinienne, censée administrer des zones de Cisjordanie et Gaza. C'est l'espoir de la <em>"Solution à deux États"</em>. Le processus s'enlise face aux extrémismes (Rabin est assassiné par un extrémiste juif en 1995, le Hamas multiplie les attentats suicides).</p>
+                            <p><strong>La Seconde Intifada (2000-2005) :</strong> Après l'échec des sommets de paix, un nouveau soulèvement palestinien, beaucoup plus militarisé et meurtrier, éclate. En réponse, Israël construit le mur de séparation en Cisjordanie et se retire unilatéralement de la bande de Gaza en 2005 (démantèlement des colonies juives de Gaza).</p>
+
+                            <h3 class="article-title">IV. La fracture palestinienne et les guerres de Gaza (2006 - 2023)</h3>
+                            <p><strong>La prise de pouvoir du Hamas (2007) :</strong> Le Hamas remporte les élections législatives palestiniennes et chasse l'Autorité palestinienne de Gaza par la force en 2007. La gouvernance palestinienne est fracturée : le Hamas (considéré comme terroriste) contrôle Gaza, le Fatah administre partiellement la Cisjordanie.</p>
+                            <p><strong>Le Blocus et l'Asymétrie :</strong> Israël et l'Égypte imposent un blocus strict sur Gaza pour empêcher l'armement du Hamas. S'ensuit une série de guerres asymétriques (2008, 2012, 2014, 2021) où le Hamas tire des roquettes vers Israël (interceptées par le "Dôme de fer"), et Israël réplique par des frappes aériennes destructrices sur cette zone ultra-dense.</p>
+
+                            <h3 class="article-title">V. Le 7 Octobre 2023 et le basculement régional (2023 - 2026)</h3>
+                            <p><strong>L'attaque du 7 Octobre 2023 :</strong> Le Hamas lance une attaque terroriste massive et inédite sur le sol israélien, causant la mort de près de 1 200 personnes et prenant plus de 250 otages. C'est le plus grand traumatisme d'Israël depuis sa création, réduisant à néant toute doctrine de coexistence pacifique à court terme.</p>
+                            <p><strong>La guerre totale à Gaza :</strong> Israël déclenche l'opération "Glaives de fer" avec pour objectif l'éradication militaire du Hamas. L'offensive terrestre et aérienne provoque une crise humanitaire sans précédent et la destruction quasi totale de l'infrastructure de la bande de Gaza, entraînant une forte polarisation diplomatique mondiale et l'intervention de la justice internationale (CIJ et CPI).</p>
+                            <p><strong>L'extension au front nord et régional (2024-2026) :</strong> Le conflit agit comme un détonateur régional. Le Hezbollah libanais ouvre un second front au nord d'Israël, provoquant l'évacuation de dizaines de milliers de civils israéliens et une vaste campagne de frappes croisées. En parallèle, les rebelles Houthis du Yémen ciblent le trafic maritime mondial en mer Rouge, forçant les États-Unis, la France et le Royaume-Uni à déployer des coalitions navales pour sécuriser cette artère commerciale mondiale.</p>
+                            <p><strong>Impasse stratégique (2026) :</strong> Aujourd'hui, la solution à deux États semble plus éloignée que jamais. Israël fait face au défi de l'administration et de la sécurisation post-conflit d'une enclave dévastée, tandis que la Cisjordanie connaît un niveau de violence endémique. L'Autorité palestinienne, affaiblie, peine à incarner une alternative politique viable dans ce paysage fracturé.</p>
+                        </div>
+                    </div>
+
+                    <!-- L'ONGLET IRAN AVEC LA FICHE LONGUE -->
+                    <div id="geo-iran" class="sub-tab-content">
+                        <div class="article-container">
+                            <img src="carte_iran.png" alt="Carte Géopolitique Iran" class="article-image">
+
+                            <h3 class="article-title">I. La fracture matricielle : Du partenariat au basculement (1953 - 1979)</h3>
+                            <p><strong>L'axe Washington-Téhéran (L'ère du Shah) :</strong> Après le coup d'État de 1953 (Opération Ajax orchestrée par la CIA), l'Iran du Shah Mohammad Reza Pahlavi devient le pilier de la stratégie américaine au Moyen-Orient (la "doctrine des deux piliers" avec l'Arabie saoudite) pour contenir l'URSS.</p>
+                            <p><strong>L'alliance périphérique avec Israël :</strong> Bien que non officielle, la coopération entre Tel-Aviv et Téhéran est majeure. Elle est fondée sur la "doctrine de la périphérie" de Ben Gourion (s'allier avec les États non arabes de la région). L'Iran fournit du pétrole à Israël en échange d'un soutien militaire, technologique et sécuritaire (formation de la SAVAK, la police secrète iranienne).</p>
+                            <p><strong>La rupture révolutionnaire (1979) :</strong> L'avènement de la République islamique sous l'Ayatollah Khomeini fait voler ce système en éclats. Khomeini conceptualise le rejet des puissances impérialistes : les États-Unis deviennent le "Grand Satan" et Israël le "Petit Satan", une entité jugée fondamentalement illégitime. La prise d'otages de l'ambassade américaine à Téhéran (1979-1981) scelle le divorce diplomatique avec Washington.</p>
+
+                            <h3 class="article-title">II. L'ère de la guerre asymétrique par procuration (1982 - 2012)</h3>
+                            <p><strong>La doctrine de la "profondeur stratégique" :</strong> Conscient de son infériorité militaire conventionnelle (accentuée par la guerre Iran-Irak), l'Iran externalise sa défense. Le Corps des Gardiens de la Révolution Islamique (CGRI) crée l'Axe de la Résistance : un réseau de milices par procuration (proxies) encerclant Israël et menaçant les bases américaines.</p>
+                            <p><strong>Les pions de Téhéran :</strong> Le Hezbollah libanais (fondé en 1982, pivot du système), le Hamas et le Jihad Islamique palestiniens, les rebelles Houthis au Yémen, et diverses milices chiites en Irak et en Syrie.</p>
+                            <p><strong>La guerre de l'ombre :</strong> Pendant 40 ans, le conflit évite l'affrontement étatique direct. Israël réplique par des opérations clandestines : cyberattaques (virus Stuxnet en 2010), sabotages industriels et assassinats ciblés de scientifiques pour ralentir le programme nucléaire iranien clandestin.</p>
+
+                            <h3 class="article-title">III. De la diplomatie d'Obama à la rupture de Trump (2015 - 2020)</h3>
+                            <p><strong>Le pari multilatéral d'Obama (Le JCPOA - 2015) :</strong> Pour désengager les États-Unis du Moyen-Orient (Pivot vers l'Asie), Obama tente de geler le risque nucléaire par la diplomatie. L'Iran accepte de brider son enrichissement d'uranium à 3,67 % en échange d'une levée des sanctions économiques. Israël dénonce un "accord historique de dupe" qui ne traite ni les missiles balistiques iraniens ni son expansionnisme régional.</p>
+                            <p><strong>Le paradoxe Trump et la "Pression Maximale" (2018) :</strong> Bien que sa doctrine America First prône l'isolationnisme et le retrait des troupes des théâtres moyen-orientaux (comme en Irak), Trump s'aligne totalement sur la position dure d'Israël. En 2018, il déchire unilatéralement le JCPOA et asphyxie l'économie iranienne par des sanctions massives. Ce choix pousse Téhéran à la rupture : relance agressive de l'enrichissement d'uranium et harcèlement maritime dans le golfe Persique.</p>
+                            <p><strong>Le dilemme du vide stratégique (Irak) :</strong> La volonté américaine de réduire sa présence militaire en Irak crée un vide immédiatement comblé par l'Iran, qui institutionnalise ses milices (Hachd al-Chaabi) au cœur de l'État irakien. En janvier 2020, Trump ordonne l'élimination par drone du général iranien Qassem Soleimani à Bagdad, frôlant la guerre ouverte.</p>
+
+                            <h3 class="article-title">IV. L'affrontement étatique direct (2024 - 2026)</h3>
+                            <p><strong>La fin des proxies (2024) :</strong> À la suite de la guerre à Gaza, l'escalade d'avril et octobre 2024 marque une rupture historique : l'Iran tire pour la première fois des centaines de missiles balistiques directement depuis son propre sol vers Israël, brisant le tabou de la confrontation frontale.</p>
+                            <p><strong>Le seuil militaire et la "Guerre des 12 jours" (Juin 2025) :</strong> L'Iran pousse ses centrifugeuses jusqu'à un enrichissement à 60 % (proche du seuil militaire de 90 %). À la suite des frappes israéliennes de juin 2025 (Guerre des 12 jours), le régime de Téhéran s'est durci à l'extrême pour étouffer toute dissidence. En fin d'année 2025 et début 2026, l'inflation galopante et les pénuries provoquées par le conflit ont déclenché des manifestations populaires massives dans tout le pays.</p>
+                            <p><strong>Les massacres de janvier 2026 :</strong> La réponse des Gardiens de la Révolution (CGRI) a été d'une violence inédite, qualifiée par les ONG de "crimes contre l'humanité". Des rapports de l'ONU font état de massacres systématiques de manifestants par les forces de sécurité et d'une explosion des exécutions politiques (plus de 2 000 recensées, touchant particulièrement les minorités kurdes et baloutches). Face à l'imminence d'une bombe iranienne, Israël déclenche une campagne aérienne préventive majeure détruisant les sites fortifiés de Natanz et Fordow.</p>
+                            <p><strong>L'Opération "Epic Fury" (Février - Mai 2026) :</strong> L'impasse géopolitique et l'effondrement des verrous diplomatiques poussent l'administration américaine et Israël à mener une offensive stratégique conjointe de décapitation politique. Des frappes massives ciblent le cœur du pouvoir à Téhéran, éliminant le Guide suprême Ali Khamenei et le haut commandement du CGRI.</p>
+                        </div>
+                    </div>
+<div id="geo-mali" class="sub-tab-content">
+                        <div class="article-container">
+                            <!-- Image d'en-tête -->
+                            <img src="carte_mali.png" alt="Carte Géopolitique Mali" class="article-image">
+
+                            <h3 class="article-title">I. L'effondrement de 2012 et le succès de Serval (2012 - 2013)</h3>
+                            <p><strong>La crise multidimensionnelle :</strong> En 2012, le Mali fait face à une rébellion indépendantiste touarègue (MNLA) dans le Nord (l'Azawad), rapidement phagocytée par des groupes jihadistes liés à Al-Qaïda (AQMI, Ansar Dine). L'armée malienne s'effondre et un coup d'État renverse le président à Bamako. Les jihadistes prennent le contrôle de tout le nord du pays (Tombouctou, Gao, Kidal).</p>
+                            <p><strong>L'Opération Serval (Janvier 2013) :</strong> Face à la menace d'une colonne jihadiste fonçant vers la capitale Bamako, le président français François Hollande déclenche l'opération Serval à la demande des autorités maliennes. C'est un succès tactique foudroyant : en quelques semaines, les forces spéciales et l'Armée de l'air françaises détruisent les sanctuaires terroristes et libèrent les villes du Nord.</p>
+
+                            <h3 class="article-title">II. L'enlisement asymétrique et l'Opération Barkhane (2014 - 2021)</h3>
+                            <p><strong>La régionalisation (Barkhane) :</strong> En 2014, Serval est remplacée par Barkhane. L'approche devient régionale, couvrant 5 pays (le G5 Sahel : Mauritanie, Mali, Burkina Faso, Niger, Tchad) pour traquer les Groupes Armés Terroristes (GAT) sur un territoire vaste comme l'Europe.</p>
+                            <p><strong>L'hydre jihadiste :</strong> Malgré l'élimination de nombreux chefs terroristes par les forces françaises, la menace mute. Les groupes s'étendent vers le centre du Mali et la zone des "trois frontières" (Mali-Niger-Burkina Faso). Deux grandes coalitions s'affrontent et terrorisent les populations : le JNIM (lié à Al-Qaïda) et l'EIGS (État Islamique au Grand Sahara).</p>
+                            <p><strong>L'impasse politique :</strong> Si Barkhane remporte des succès militaires (victoires tactiques), l'État malien échoue à ramener l'administration, la justice et le développement dans les zones libérées. Ce vide étatique alimente la colère des populations civiles.</p>
+
+                            <h3 class="article-title">III. Putschs, rupture avec la France et l'arrivée de Wagner (2020 - 2023)</h3>
+                            <p><strong>La succession de coups d'État :</strong> L'incapacité du gouvernement civil à sécuriser le pays provoque deux putschs militaires successifs (2020 et 2021), portant au pouvoir une junte dirigée par le colonel Assimi Goïta.</p>
+                            <p><strong>La guerre de l'information et la rupture :</strong> La junte instrumentalise un fort sentiment anti-français (attisé par des campagnes de désinformation russes sur les réseaux sociaux). Bamako se tourne vers la Russie et fait appel à la société militaire privée russe <strong>Wagner</strong> (désormais réorganisée sous l'égide de l'Africa Corps russe).</p>
+                            <p><strong>Le retrait français et international :</strong> Devenue indésirable, l'armée française quitte définitivement le Mali en août 2022 après 9 ans de présence. En 2023, la junte exige et obtient le départ de la MINUSMA (la force de maintien de la paix de l'ONU).</p>
+
+                            <h3 class="article-title">IV. Le nouvel ordre sahélien : L'Alliance des États du Sahel (2023 - 2026)</h3>
+                            <p><strong>L'Alliance des États du Sahel (AES) :</strong> Le Mali, le Burkina Faso et le Niger (tous trois dirigés par des juntes militaires putschistes) s'allient fin 2023 pour former l'AES, un pacte de défense mutuelle. En 2024, ils annoncent leur retrait fracassant de la CEDEAO (l'organisation économique régionale ouest-africaine), actant une fracture géopolitique majeure en Afrique de l'Ouest.</p>
+                            <p><strong>Le pivot vers la Russie :</strong> Ces États assument une rupture stratégique totale avec l'Occident au profit de partenariats sécuritaires avec Moscou, et économiques avec la Chine et la Turquie.</p>
+                            <p><strong>Une situation sécuritaire très dégradée :</strong> Sur le terrain, les Forces armées maliennes (FAMa), appuyées par les mercenaires russes, ont repris la ville symbolique de Kidal aux rebelles touaregs fin 2023. Cependant, la violence atteint des records. Les affrontements avec le JNIM et l'État Islamique se multiplient, et les tactiques brutales de Wagner entraînent des massacres de civils, plongeant la région dans une crise humanitaire endémique sans perspective de résolution politique.</p>
+                        </div>
+                    </div>
+                </div>
+
+    <!-- HISTOIRE -->
+                <div id="histoire" class="tab-content">
+                    <h2>Histoire Militaire & Événements</h2>
+                    
+                    <div class="sub-nav">
+                        <button class="sub-tab-button active" onclick="switchSubTab(event, 'hist-ancien')">Ancien Régime & Empire</button>
+                        <button class="sub-tab-button" onclick="switchSubTab(event, 'hist-contemporain')">Conflits Contemporains</button>
+                        <button class="sub-tab-button" onclick="switchSubTab(event, 'hist-monde')">Événements Mondiaux</button>
+                        <button class="sub-tab-button" onclick="switchSubTab(event, 'hist-aerien')">Guerre Aérienne</button>
+                    </div>
+
+                    <!-- Sous-dossier 1 : Ancien Régime & Empire -->
+                    <div id="hist-ancien" class="sub-tab-content active">
+                        <div class="article-container">
+                            <h3 class="article-title">Bataille d'Azincourt (25 Octobre 1415)</h3>
+                            <p><strong>Belligérants :</strong> Royaume de France (Chevalerie lourde) contre Royaume d'Angleterre (Henri V).</p>
+                            <p><strong>Contexte :</strong> Guerre de Cent Ans. L'armée anglaise, épuisée et en infériorité numérique, tente de regagner Calais mais est bloquée par l'armée française.</p>
+                            <p><strong>Déroulement & Leçon tactique :</strong> Le terrain est boueux et le champ de bataille forme un entonnoir. La chevalerie française, engoncée dans de lourdes armures, s'embourbe et se gêne. Elle est décimée à distance par les archers anglais équipés d'arcs longs (longbows). C'est l'exemple absolu de l'incapacité d'une armée à adapter sa doctrine face au terrain et à une innovation tactique (la supériorité de l'infanterie à distance sur la charge de cavalerie).</p>
+
+                            <h3 class="article-title">Massacre de la Saint-Barthélemy (24 Août 1572)</h3>
+                            <p><strong>Belligérants :</strong> Catholiques (soutenus par la monarchie et les Guise) contre Protestants (Huguenots).</p>
+                            <p><strong>Contexte :</strong> Guerres de religion en France. Le massacre survient quelques jours après le mariage d'Henri de Navarre (protestant, futur Henri IV) et de Marguerite de Valois (catholique), qui devait sceller la paix.</p>
+                            <p><strong>Déroulement :</strong> À la suite de la tentative d'assassinat de l'Amiral de Coligny (chef militaire protestant), le roi Charles IX et Catherine de Médicis décident d'éliminer les chefs huguenots présents à Paris. L'opération dégénère en un massacre populaire incontrôlable qui s'étend aux provinces, faisant des milliers de morts et creusant un fossé de sang entre les deux confessions.</p>
+
+                            <h3 class="article-title">Bataille d'Austerlitz (2 Décembre 1805)</h3>
+                            <p><strong>Belligérants :</strong> L'Empire Français (Napoléon Ier) contre la Troisième Coalition (Russie d'Alexandre Ier et Autriche de François II).</p>
+                            <p><strong>Contexte :</strong> Surnommée la "Bataille des Trois Empereurs", elle a lieu un an jour pour jour après le sacre de Napoléon. La Grande Armée est isolée et en infériorité numérique en Europe centrale.</p>
+                            <p><strong>Déroulement & Leçon tactique :</strong> C'est le chef-d'œuvre absolu de l'art opératif. Napoléon feint la faiblesse, demande à négocier, et dégarnit volontairement son flanc droit pour inciter les Austro-Russes à l'attaquer et à quitter les hauteurs du plateau de Pratzen. Une fois l'ennemi piégé, le centre français attaque par surprise, reprend le plateau et coupe l'armée coalisée en deux. La victoire met fin au Saint-Empire romain germanique.</p>
+                        </div>
+                    </div>
+
+                    <!-- Sous-dossier 2 : Conflits Contemporains -->
+                    <div id="hist-contemporain" class="sub-tab-content">
+                        <div class="article-container">
+                            <h3 class="article-title">Bataille de Verdun (1916)</h3>
+                            <p><strong>Belligérants :</strong> France contre Empire Allemand.</p>
+                            <p><strong>Contexte :</strong> Première Guerre mondiale. L'état-major allemand (général Falkenhayn) veut lancer une offensive massive sur un point symbolique pour "saigner à blanc" l'armée française et forcer sa capitulation.</p>
+                            <p><strong>Déroulement :</strong> Un déluge d'artillerie sans précédent s'abat sur les forts de Verdun. La résistance française tient grâce à un système ingénieux : le "tourniquet" (rotation rapide des régiments au front pour éviter l'épuisement total) et surtout la "Voie Sacrée", une route logistique ininterrompue organisée par le général Pétain pour acheminer munitions et relèves de jour comme de nuit.</p>
+
+                            <h3 class="article-title">Bataille de Diên Biên Phu (1954)</h3>
+                            <p><strong>Belligérants :</strong> Armée française contre le Việt Minh (Général Giap).</p>
+                            <p><strong>Contexte :</strong> Guerre d'Indochine. Le commandement français installe un vaste camp retranché aéroterrestre dans une cuvette au nord-ouest du Vietnam pour couper les routes d'approvisionnement ennemies et forcer Giap à une bataille rangée.</p>
+                            <p><strong>Déroulement :</strong> Sous-estimant les capacités logistiques ennemies, les Français sont surpris lorsque Giap réussit l'exploit de hisser de l'artillerie lourde sur les collines dominant le camp. La piste d'aviation est rapidement détruite, privant la base de son pont aérien. C'est une leçon brutale sur l'encerclement, la logistique asymétrique et le renseignement, marquant la fin de la présence française en Indochine.</p>
+
+                            <h3 class="article-title">Guerre du Golfe / Opération Daguet (1991)</h3>
+                            <p><strong>Belligérants :</strong> Coalition internationale de 35 pays (dont la division française Daguet) contre l'Irak de Saddam Hussein.</p>
+                            <p><strong>Contexte :</strong> En août 1990, l'Irak envahit et annexe le Koweït. L'ONU mandate une coalition militaire (dirigée par les États-Unis) pour libérer le pays.</p>
+                            <p><strong>Déroulement :</strong> La coalition débute par l'opération "Tempête du désert", une campagne de bombardements aériens massifs de 39 jours qui pulvérise les centres de commandement irakiens. S'ensuit une offensive terrestre éclair de 100 heures. C'est la première guerre de l'ère moderne illustrant la supériorité absolue de la technologie (frappes chirurgicales, furtivité) et de la maîtrise de l'espace aérien.</p>
+                        </div>
+                    </div>
+
+                    <!-- Sous-dossier 3 : Événements Mondiaux -->
+                    <div id="hist-monde" class="sub-tab-content">
+                        <div class="article-container">
+                            <h3 class="article-title">Répression de la place Tian'anmen (1989)</h3>
+                            <p><strong>Acteurs :</strong> Étudiants et population civile chinoise contre l'Armée Populaire de Libération (Parti Communiste Chinois).</p>
+                            <p><strong>Contexte :</strong> Printemps 1989. Un vaste mouvement pacifique occupe la grande place de Pékin pour réclamer des réformes démocratiques, la liberté d'expression et la fin de la corruption.</p>
+                            <p><strong>Déroulement :</strong> Après des semaines d'hésitation, le régime déclare la loi martiale. Dans la nuit du 3 au 4 juin, les chars et les troupes d'assaut écrasent la manifestation en tirant à balles réelles. Le bilan est estimé à plusieurs milliers de morts. La photo d'un homme seul bloquant une colonne de chars ("Tank Man") devient le symbole mondial de cette répression autoritaire.</p>
+
+                            <h3 class="article-title">Chute du Mur de Berlin (9 Novembre 1989)</h3>
+                            <p><strong>Acteurs :</strong> La population de l'Allemagne de l'Est (RDA) et le gouvernement soviétique.</p>
+                            <p><strong>Contexte :</strong> Depuis 1961, le Mur symbolise le "Rideau de fer" divisant l'Europe entre le bloc de l'Ouest (capitaliste) et le bloc de l'Est (communiste). À la fin des années 80, le bloc soviétique est économiquement exsangue.</p>
+                            <p><strong>Déroulement :</strong> À la suite d'une conférence de presse mal préparée annonçant l'assouplissement des visas, des milliers de Berlinois de l'Est se massent aux postes-frontières. Débordés et sans ordres clairs, les gardes ouvrent les barrières sans tirer. Le mur est détruit par la foule, marquant la réunification de l'Allemagne et annonçant la fin de la Guerre Froide.</p>
+
+                            <h3 class="article-title">Génocide des Tutsis au Rwanda (1994)</h3>
+                            <p><strong>Acteurs :</strong> Gouvernement et milices extrémistes Hutus contre la minorité Tutsi et les Hutus modérés.</p>
+                            <p><strong>Contexte :</strong> Tensions ethniques instrumentalisées historiquement. Le 6 avril 1994, l'avion du président rwandais (Hutu) est abattu, servant de déclencheur au massacre préparé par les extrémistes.</p>
+                            <p><strong>Déroulement :</strong> En 100 jours seulement, environ 800 000 personnes sont exterminées, souvent à l'arme blanche (machette). Les forces de l'ONU sur place (MINUAR) sont réduites et n'ont pas de mandat pour ouvrir le feu et stopper les massacres. C'est l'un des plus grands échecs moraux et diplomatiques de la communauté internationale du XXe siècle.</p>
+                        </div>
+                    </div>
+
+                    <!-- Sous-dossier 4 : Guerre Aérienne -->
+                    <div id="hist-aerien" class="sub-tab-content">
+                        <div class="article-container">
+                            <h3 class="article-title">Bataille d'Angleterre (1940)</h3>
+                            <p><strong>Belligérants :</strong> Royal Air Force (Royaume-Uni) contre la Luftwaffe (Allemagne nazie).</p>
+                            <p><strong>Contexte :</strong> Après la chute de la France, Hitler prépare l'invasion de la Grande-Bretagne (Opération Lion de Mer). Pour que la flotte puisse traverser la Manche, il doit d'abord anéantir l'aviation britannique.</p>
+                            <p><strong>Déroulement :</strong> C'est la première grande bataille de l'histoire disputée entièrement dans les airs. Les Britanniques l'emportent grâce à une innovation technologique majeure : le <em>radar</em> (le réseau Chain Home), qui permet d'intercepter les escadres de bombardiers allemands au lieu de patrouiller à l'aveugle. "Jamais dans le domaine des conflits humains, tant de gens n'ont dû autant à un si petit nombre." (Winston Churchill).</p>
+
+                            <h3 class="article-title">Bataille de Midway (Juin 1942)</h3>
+                            <p><strong>Belligérants :</strong> US Navy (États-Unis) contre la Marine impériale japonaise.</p>
+                            <p><strong>Contexte :</strong> Six mois après Pearl Harbor, le Japon veut anéantir le reste de la flotte du Pacifique américaine et prendre l'île stratégique de Midway.</p>
+                            <p><strong>Déroulement :</strong> L'intelligence militaire américaine réussit à décrypter le code secret japonais et connaît l'attaque à l'avance. C'est la première grande bataille aéronavale : les flottes de surface ne se voient jamais, tout se joue avec l'aviation embarquée sur porte-avions. Les bombardiers en piqué américains coulent 4 porte-avions japonais en une matinée. Tournant définitif de la Seconde Guerre mondiale dans le Pacifique.</p>
+
+                            <h3 class="article-title">Opération Focus (1967)</h3>
+                            <p><strong>Belligérants :</strong> Armée de l'air israélienne contre les aviations d'Égypte, de Syrie et de Jordanie.</p>
+                            <p><strong>Contexte :</strong> Guerre des Six Jours. Israël est encerclé par une coalition arabe qui masse ses troupes aux frontières. Israël décide de frapper le premier.</p>
+                            <p><strong>Déroulement :</strong> Au petit matin du 5 juin, la quasi-totalité des chasseurs israéliens décolle dans un silence radio total. Volant au ras des flots pour passer sous les radars égyptiens, ils détruisent les pistes et les avions ennemis encore au sol. En quelques heures, l'aviation arabe est anéantie, offrant à Israël la supériorité aérienne totale pour soutenir son offensive terrestre.</p>
+
+                            <h3 class="article-title">Guerre des Malouines (1982)</h3>
+                            <p><strong>Belligérants :</strong> Royaume-Uni contre Argentine.</p>
+                            <p><strong>Contexte :</strong> La junte militaire argentine envahit les îles Malouines (Falklands), un territoire britannique situé dans l'Atlantique Sud. Le Royaume-Uni envoie une imposante force expéditionnaire navale pour les reconquérir.</p>
+                            <p><strong>Déroulement :</strong> Le conflit marque l'histoire aéronavale par l'utilisation foudroyante par l'Argentine de l'avion d'attaque français <em>Super-Étendard</em> armé du redoutable missile antinavire <em>Exocet</em>. Un seul missile rase les flots et coule le destroyer britannique HMS Sheffield. C'est une leçon mondiale sur la vulnérabilité des navires de surface modernes face aux missiles "sea-skimming".</p>
+                        </div>
+                    </div>
+                </div>
+               <!-- CULTURE GÉNÉRALE -->
+                <div id="culture-gen" class="tab-content">
+                    <h2>Culture Générale</h2>
+                    
+                    <!-- Navigation des sous-dossiers -->
+                    <div class="sub-nav">
+                        <button class="sub-tab-button active" onclick="switchSubTab(event, 'cg-aviateurs')">Aviateurs Connus</button>
+                        <button class="sub-tab-button" onclick="switchSubTab(event, 'cg-ue')">Union Européenne</button>
+                        <button class="sub-tab-button" onclick="switchSubTab(event, 'cg-onu')">ONU</button>
+                        <button class="sub-tab-button" onclick="switchSubTab(event, 'cg-otan')">OTAN</button>
+                        <button class="sub-tab-button" onclick="switchSubTab(event, 'cg-classiques')">Classiques Français</button>
+                    </div>
+
+                    <!-- Sous-dossier 1 : Aviateurs Connus -->
+                    <div id="cg-aviateurs" class="sub-tab-content active">
+                        <div class="flashcard-grid">
+                            <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner">
+                                <div class="card-front">Georges Guynemer</div>
+                                <div class="card-back">As de l'aviation (1ère GM, 53 victoires). Sa devise "Faire face" est devenue celle de l'École de l'air.</div>
+                            </div></div>
+                            
+                            <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner">
+                                <div class="card-front">Caroline Aigle</div>
+                                <div class="card-back">Première femme pilote de chasse affectée en escadron de combat (1999, sur Mirage 2000).</div>
+                            </div></div>
+
+                            <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner">
+                                <div class="card-front">Antoine de Saint-Exupéry</div>
+                                <div class="card-back">Pionnier de l'Aéropostale, écrivain et pilote de reconnaissance. Disparu en vol en 1944.</div>
+                            </div></div>
+
+                            <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner">
+                                <div class="card-front">Jean Mermoz</div>
+                                <div class="card-back">Figure légendaire de l'Aéropostale (surnommé "l'Archange"). Réalise la première traversée de l'Atlantique Sud en 1930.</div>
+                            </div></div>
+
+                            <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner">
+                                <div class="card-front">Roland Garros</div>
+                                <div class="card-back">Première traversée de la Méditerranée (1913). A mis au point le tir à travers l'hélice pendant la 1ère GM.</div>
+                            </div></div>
+
+                            <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner">
+                                <div class="card-front">Jacqueline Auriol</div>
+                                <div class="card-back">Première femme pilote d'essai en France (1950) et première Européenne à franchir le mur du son (1953).</div>
+                            </div></div>
+                        </div>
+                    </div>
+
+                    <!-- Sous-dossier 2 : Union Européenne -->
+                    <div id="cg-ue" class="sub-tab-content">
+                        <div class="article-container">
+                            <h3 class="article-title">L'Europe (De la CECA à la Défense)</h3>
+                            <p><strong>La genèse (La CECA) :</strong> Tout part de la <strong>CECA</strong> (Communauté Européenne du Charbon et de l'Acier), créée en 1951 (Déclaration Schuman). L'idée fondatrice : mettre en commun la production des matières premières de la guerre (charbon et acier) entre la France et l'Allemagne pour rendre un nouveau conflit matériellement impossible. Cela mènera au Traité de Rome (1957) et à l'actuelle UE (27 États membres).</p>
+                            <p><strong>La Défense (PSDC) :</strong> La Politique de Sécurité et de Défense Commune permet à l'UE de mener des opérations extérieures (ex: mission navale Atalante, ou missions de formation EUTM).</p>
+                            <p><strong>La clause de solidarité (Article 42.7) :</strong> C'est l'équivalent européen de l'Article 5 de l'OTAN. Invoqué pour la toute première fois par la France après les attentats du 13 novembre 2015 pour demander l'assistance des autres pays membres.</p>
+                            <p><strong>L'Autonomie Stratégique :</strong> Idée portée historiquement par la France : l'Europe doit développer sa propre industrie de défense et sa capacité militaire pour agir seule si nécessaire, tout en gardant l'OTAN comme bouclier principal.</p>
+                        </div>
+                    </div>
+
+                    <!-- Sous-dossier 3 : ONU -->
+                    <div id="cg-onu" class="sub-tab-content">
+                        <div class="article-container">
+                            <h3 class="article-title">L'ONU (Organisation des Nations Unies)</h3>
+                            <p><strong>Création :</strong> 24 octobre 1945 (Charte de San Francisco) pour remplacer la SDN (Société des Nations), qui avait échoué à empêcher la Seconde Guerre mondiale. Elle compte aujourd'hui 193 États membres.</p>
+                            <p><strong>Le Conseil de Sécurité (L'organe de décision) :</strong> C'est ici que se joue la vraie géopolitique ! Il est composé de 15 membres. 10 sont élus pour deux ans, mais surtout, <strong>5 sont des membres permanents avec droit de veto</strong> : la France, les États-Unis, le Royaume-Uni, la Russie et la Chine (les vainqueurs de 1945). Un seul veto bloque toute résolution.</p>
+                            <p><strong>Rôle militaire (Casques Bleus) :</strong> L'ONU n'a pas d'armée en propre. Le Conseil de sécurité mandate des "Opérations de Maintien de la Paix" (OMP) pour lesquelles les États membres prêtent leurs propres soldats (les Casques bleus) afin de sécuriser des zones de conflit.</p>
+                            <p><strong>Le Secrétaire Général :</strong> Le diplomate en chef de l'ONU. Actuellement le Portugais António Guterres (depuis 2017).</p>
+                        </div>
+                    </div>
+
+                    <!-- Sous-dossier 4 : OTAN -->
+                    <div id="cg-otan" class="sub-tab-content">
+                        <div class="article-container">
+                            <h3 class="article-title">L'OTAN (Organisation du Traité de l'Atlantique Nord)</h3>
+                            <p><strong>Création :</strong> 4 avril 1949 (Traité de Washington) pour contrer la menace soviétique.</p>
+                            <p><strong>Membres :</strong> 32 pays (dont la Finlande en 2023 et la Suède en 2024, en réponse à la guerre en Ukraine).</p>
+                            <p><strong>Le fonctionnement (Le Conseil) :</strong> Contrairement à l'ONU, il n'y a <strong>pas de membres permanents</strong> ni de veto exclusif à l'OTAN. La règle absolue est le <strong>consensus</strong> : tous les alliés siègent au Conseil de l'Atlantique Nord et toutes les décisions doivent être prises à l'unanimité.</p>
+                            <p><strong>Le Commandement :</strong> Sur le plan militaire, le Commandant suprême des forces alliées en Europe (SACEUR) est traditionnellement un général américain. Le Secrétaire général (l'organe politique) est lui toujours un Européen.</p>
+                            <p><strong>L'Article 5 :</strong> C'est la base de la défense collective. <em>"Une attaque armée contre l'un d'entre eux est considérée comme une attaque dirigée contre tous."</em> Il n'a été invoqué qu'une seule fois : par les États-Unis après le 11 septembre 2001.</p>
+                            <p><strong>La France :</strong> Retrait du commandement militaire intégré en 1966 (Général de Gaulle) pour garantir l'indépendance de sa force de dissuasion nucléaire, puis réintégration officielle en 2009 (Nicolas Sarkozy).</p>
+                        </div>
+                    </div>
+
+                    <!-- Sous-dossier 5 : Classiques Français -->
+                    <div id="cg-classiques" class="sub-tab-content">
+                        <div class="article-container">
+                            <h3 class="article-title">Le Dilemme Cornélien</h3>
+                            <p><strong>Origine :</strong> Issu du théâtre classique français, notamment de la pièce <em>Le Cid</em> (1637) écrite par Pierre Corneille.</p>
+                            <p><strong>La situation (Rodrigue) :</strong> Le héros, Rodrigue, doit venger l'honneur de son père qui a été insulté (giflé) par le père de Chimène, la femme qu'il aime et qu'il doit épouser. S'il ne se bat pas, il perd son honneur et n'est plus digne d'elle. S'il se bat (et tue son futur beau-père), il fait son devoir mais perd l'amour de sa vie à tout jamais.</p>
+                            <p><strong>Le sens :</strong> Un dilemme cornélien désigne une situation où un individu est confronté à un choix impossible entre <strong>deux valeurs tout aussi nobles et impérieuses l'une que l'autre</strong> (ici, l'honneur familial contre l'amour passionnel). Quelle que soit la décision prise, elle entraînera un sacrifice tragique.</p>
+                            <p><strong>La leçon pour l'officier :</strong> C'est l'incarnation de la "solitude du chef" et de l'éthique militaire : devoir parfois accomplir la mission (le devoir) au détriment de ses propres sentiments ou intérêts personnels.</p>
+
+                            <h3 class="article-title">Le Vase de Soissons</h3>
+                            <p><strong>Contexte historique (486 après J.-C.) :</strong> Clovis, jeune roi des Francs (pas encore baptisé), vient de remporter la bataille de Soissons contre Syagrius (le dernier représentant romain en Gaule).</p>
+                            <p><strong>L'anecdote :</strong> L'armée franque pille les églises. L'évêque de Reims, Remi, supplie Clovis de lui restituer un vase liturgique d'une valeur inestimable. Clovis accepte pour s'attirer les faveurs de l'Église, mais selon la coutume franque du butin, le roi n'a droit qu'à ce que le sort lui attribue. Lors du partage, Clovis demande le vase hors part. Un soldat jaloux et insolent frappe le vase d'un coup de hache en disant : <em>« Tu n'auras rien ici que ce que le sort t'attribuera ! »</em>. Clovis ravale sa colère et ne dit rien.</p>
+                            <p><strong>Le dénouement ("Ainsi as-tu fait...") :</strong> Un an plus tard (le 1er mars), lors de la revue militaire de ses troupes, Clovis reconnaît le soldat insolent. Il lui reproche la mauvaise tenue de ses armes et les jette à terre. Alors que le soldat se penche pour les ramasser, Clovis lui fracasse le crâne d'un coup de francisque (hache) en criant : <em><strong>« Ainsi as-tu fait au vase, à Soissons ! »</strong></em>.</p>
+                            <p><strong>La leçon pour l'officier :</strong> Cet événement mythique illustre le passage du "chef de tribu" (où le roi est l'égal des guerriers pour le butin) au "monarque absolu" (qui détient le droit de vie ou de mort). Il montre surtout la maîtrise de soi du chef : savoir ne pas réagir à chaud sous le coup de l'émotion, mais punir l'indiscipline de manière implacable avec le bon timing, pour imposer une autorité incontestable.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CULTURE AAE -->
+                <div id="armee-air" class="tab-content">
+                    <h2>Culture AAE</h2>
+                    <div class="sub-nav">
+                        <button class="sub-tab-button active" onclick="switchSubTab(event, 'aae-opex')">OPEX</button>
+                        <button class="sub-tab-button" onclick="switchSubTab(event, 'aae-ecole')">École de l'Air / Formation</button>
+                        <button class="sub-tab-button" onclick="switchSubTab(event, 'aae-rafale')">Le Rafale</button>
+                    </div>
+
+                    <div id="aae-opex" class="sub-tab-content active">
+                        <div class="flashcard-grid">
+                            <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner">
+                                <div class="card-front">Opération Chammal</div>
+                                <div class="card-back">Volet français de l'opération Inherent Resolve contre Daech au Levant (Irak/Syrie) depuis 2014.</div>
+                            </div></div>
+                        </div>
+                    </div>
+                    <div id="aae-ecole" class="sub-tab-content">
+                        <div class="article-container">
+                            <h3 class="article-title">Le Cursus Pilote de Chasse : Officier de Carrière</h3>
+                            <p>Le parcours d'un élève officier (issu de CPGE) dure environ 4 à 5 ans avant de rejoindre un escadron de combat. Ce cursus a été récemment révolutionné pour intégrer la montée en puissance technologique des aéronefs de 5e génération (Rafale).</p>
+
+                            <h3 class="article-title">1. L'École de l'Air et de l'Espace (Salon-de-Provence)</h3>
+                            <p><strong>Formation militaire et académique :</strong> Les premières années sont consacrées à la formation militaire de l'officier et à la validation du diplôme d'ingénieur. En parallèle, l'élève doit impérativement obtenir son <strong>ATPL théorique</strong> (Airline Transport Pilot License), le socle de connaissances aéronautiques réglementaires.</p>
+                            <p><strong>Le Vol à voile (Planeur) :</strong> C'est la première approche du pilotage. Cette phase est cruciale pour développer le "sens de l'air", l'anticipation, la gestion de l'énergie et la finesse des commandes sans l'aide d'un moteur.</p>
+
+                            <h3 class="article-title">2. L'Initiation et la Sélection en vol</h3>
+                            <p><strong>Les vols sur Grob 120 :</strong> L'élève effectue ses premiers vols motorisés sur cet avion léger. L'objectif est d'acquérir les fondamentaux du pilotage (décollage, atterrissage, maniabilité de base) et de valider définitivement l'orientation vers la filière "Chasse".</p>
+
+                            <h3 class="article-title">3. Le programme FOMDEC (Cognac - BA 709)</h3>
+                            <p>La <strong>FOMDEC</strong> (Formation Modernisée des Équipages de Chasse) a remplacé les anciennes flottes (Epsilon et Alpha Jet) par le <strong>Pilatus PC-21</strong>. Ce turbopropulseur surpuissant possède un cockpit en verre (Glass Cockpit) dont l'avionique simule parfaitement les systèmes d'armes du Rafale.</p>
+                            <p><strong>FOMDEC 1 (Phase de base) :</strong> Apprentissage du pilotage avancé, vol aux instruments, voltige, navigation à très basse altitude et vol en formation. À l'issue de cette phase, l'élève reçoit le fameux "macaron" (Brevet de pilote de chasse).</p>
+                            <p><strong>FOMDEC 2 (Phase tactique) :</strong> L'avion devient un système d'armes. L'officier s'entraîne au combat aérien, au tir air-sol simulé, à l'interception et aux missions tactiques complexes. Cette phase s'appuie massivement sur la simulation au sol connectée aux avions en vol.</p>
+
+                            <h3 class="article-title">4. La Transition et l'Entrée en Escadron</h3>
+                            <p><strong>Transformation Opérationnelle :</strong> L'officier breveté rejoint un Escadron de Transformation (comme l'ETR à Saint-Dizier pour le Rafale ou l'Escadron de transition opérationnelle à Cazaux). Il y apprend à maîtriser sa machine de guerre finale à réaction.</p>
+                            <p><strong>Arrivée en Unité :</strong> Il intègre enfin son escadron de combat opérationnel. Il commence au bas de l'échelle tactique en tant que "Pilote Opérationnel" (PO / Équipier), prêt à entamer sa longue progression vers les qualifications de Sous-chef puis Chef de patrouille.</p>
+                        </div>
+                    </div>
+
+                <!-- ESM SAINT-CYR -->
+                <div id="esm" class="tab-content">
+                    <h2>ESM Saint-Cyr</h2>
+                    <div class="sub-nav">
+                        <button class="sub-tab-button active" onclick="switchSubTab(event, 'esm-histoire')">Histoire de l'école</button>
+                    </div>
+                    <div id="esm-histoire" class="sub-tab-content active">
+                        <div class="flashcard-grid">
+                            <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner">
+                                <div class="card-front">Création de l'ESM ?</div>
+                                <div class="card-back">Créée le 1er mai 1802 par Napoléon Bonaparte à Fontainebleau, avant d'être transférée à Saint-Cyr.</div>
+                            </div></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT JAVASCRIPT -->
+    <script>
+        const MOT_DE_PASSE_SECRET = "77"; 
+
+        function checkPassword() {
+            const input = document.getElementById('password-input').value;
+            const errorMsg = document.getElementById('login-error');
+            const overlay = document.getElementById('login-overlay');
+            const mainApp = document.getElementById('main-app');
+
+            if (input === MOT_DE_PASSE_SECRET) {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.visibility = 'hidden';
+                    mainApp.style.visibility = 'visible';
+                    mainApp.style.opacity = '1';
+                }, 600);
+            } else {
+                errorMsg.style.display = 'block';
+                document.querySelector('.login-box').style.transform = 'translateX(8px)';
+                setTimeout(() => document.querySelector('.login-box').style.transform = 'translateX(-8px)', 100);
+                setTimeout(() => document.querySelector('.login-box').style.transform = 'translateX(0)', 200);
+            }
+        }
+
+        function handleEnter(event) {
+            if (event.key === "Enter") {
+                checkPassword();
+            }
+        }
+
+        function switchTab(evt, tabId) {
+            document.querySelectorAll('.category-card').forEach(card => card.classList.remove('active'));
+            evt.currentTarget.classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function switchSubTab(evt, subTabId) {
+            const parentTab = evt.currentTarget.closest('.tab-content');
+
+            parentTab.querySelectorAll('.sub-tab-button').forEach(btn => btn.classList.remove('active'));
+            evt.currentTarget.classList.add('active');
+
+            parentTab.querySelectorAll('.sub-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.getElementById(subTabId).classList.add('active');
+        }
+    </script>
+</body>
+</html>
