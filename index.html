@@ -745,12 +745,15 @@
                 <!-- CULTURE AAE -->
                 <div id="armee-air" class="tab-content">
                     <h2>Culture AAE</h2>
+                    
                     <div class="sub-nav">
                         <button class="sub-tab-button active" onclick="switchSubTab(event, 'aae-opex')">OPEX</button>
                         <button class="sub-tab-button" onclick="switchSubTab(event, 'aae-ecole')">École de l'Air / Formation</button>
-                        <button class="sub-tab-button" onclick="switchSubTab(event, 'aae-rafale')">Le Rafale</button>
+                        <button class="sub-tab-button" onclick="switchSubTab(event, 'aae-avions')">Avions Opérationnels</button>
+                        <button class="sub-tab-button" onclick="switchSubTab(event, 'aae-missions')">Missions & Exercices (H.I)</button>
                     </div>
 
+                    <!-- 1. OPEX -->
                     <div id="aae-opex" class="sub-tab-content active">
                         <div class="flashcard-grid">
                             <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner">
@@ -759,28 +762,106 @@
                             </div></div>
                         </div>
                     </div>
+                    
+                    <!-- 2. FORMATION (À REMPLIR MANUELLEMENT) -->
                     <div id="aae-ecole" class="sub-tab-content">
                         <div class="article-container">
                             <h3 class="article-title">Le Cursus Pilote de Chasse : Officier de Carrière</h3>
-                            <p>Le parcours d'un élève officier (issu de CPGE) dure environ 4 à 5 ans avant de rejoindre un escadron de combat. Ce cursus a été récemment révolutionné pour intégrer la montée en puissance technologique des aéronefs de 5e génération (Rafale).</p>
-
-                            <h3 class="article-title">1. L'École de l'Air et de l'Espace (Salon-de-Provence)</h3>
-                            <p><strong>Formation militaire et académique :</strong> Les premières années sont consacrées à la formation militaire de l'officier et à la validation du diplôme d'ingénieur. En parallèle, l'élève doit impérativement obtenir son <strong>ATPL théorique</strong> (Airline Transport Pilot License), le socle de connaissances aéronautiques réglementaires.</p>
-                            <p><strong>Le Vol à voile (Planeur) :</strong> C'est la première approche du pilotage. Cette phase est cruciale pour développer le "sens de l'air", l'anticipation, la gestion de l'énergie et la finesse des commandes sans l'aide d'un moteur.</p>
-
-                            <h3 class="article-title">2. L'Initiation et la Sélection en vol</h3>
-                            <p><strong>Les vols sur Grob 120 :</strong> L'élève effectue ses premiers vols motorisés sur cet avion léger. L'objectif est d'acquérir les fondamentaux du pilotage (décollage, atterrissage, maniabilité de base) et de valider définitivement l'orientation vers la filière "Chasse".</p>
-
-                            <h3 class="article-title">3. Le programme FOMDEC (Cognac - BA 709)</h3>
-                            <p>La <strong>FOMDEC</strong> (Formation Modernisée des Équipages de Chasse) a remplacé les anciennes flottes (Epsilon et Alpha Jet) par le <strong>Pilatus PC-21</strong>. Ce turbopropulseur surpuissant possède un cockpit en verre (Glass Cockpit) dont l'avionique simule parfaitement les systèmes d'armes du Rafale.</p>
-                            <p><strong>FOMDEC 1 (Phase de base) :</strong> Apprentissage du pilotage avancé, vol aux instruments, voltige, navigation à très basse altitude et vol en formation. À l'issue de cette phase, l'élève reçoit le fameux "macaron" (Brevet de pilote de chasse).</p>
-                            <p><strong>FOMDEC 2 (Phase tactique) :</strong> L'avion devient un système d'armes. L'officier s'entraîne au combat aérien, au tir air-sol simulé, à l'interception et aux missions tactiques complexes. Cette phase s'appuie massivement sur la simulation au sol connectée aux avions en vol.</p>
-
-                            <h3 class="article-title">4. La Transition et l'Entrée en Escadron</h3>
-                            <p><strong>Transformation Opérationnelle :</strong> L'officier breveté rejoint un Escadron de Transformation (comme l'ETR à Saint-Dizier pour le Rafale ou l'Escadron de transition opérationnelle à Cazaux). Il y apprend à maîtriser sa machine de guerre finale à réaction.</p>
-                            <p><strong>Arrivée en Unité :</strong> Il intègre enfin son escadron de combat opérationnel. Il commence au bas de l'échelle tactique en tant que "Pilote Opérationnel" (PO / Équipier), prêt à entamer sa longue progression vers les qualifications de Sous-chef puis Chef de patrouille.</p>
+                            <p>
+                                <em>[Espace réservé pour vos notes personnelles sur le cursus de formation à Salon-de-Provence et Cognac...]</em>
+                            </p>
                         </div>
                     </div>
+                    
+                    <!-- 3. AVIONS OPÉRATIONNELS -->
+                    <div id="aae-avions" class="sub-tab-content">
+                        
+                        <!-- RAFALE -->
+                        <div class="article-container" style="margin-bottom: 25px;">
+                            <img src="rafale.png" alt="Dassault Rafale" class="article-image">
+                            <h3 class="article-title" style="margin-top: 0;">Dassault Rafale (B / C)</h3>
+                            <p><strong>Constructeur :</strong> Dassault Aviation | <strong>Prix unitaire :</strong> ~75 à 90 M€ (selon version)</p>
+                            <p><strong>Caractéristiques :</strong> Chasseur omnirôle biréacteur, voilure delta et plans canards. Vitesse maximale : Mach 1,8 (2 200 km/h). Plafond opérationnel : 15 000 mètres. Propulsion : 2 turboréacteurs Safran M88.</p>
+                            <p><strong>Missions :</strong> Supériorité aérienne, interception, frappe chirurgicale dans la profondeur, reconnaissance tactique/stratégique, police du ciel (PPS-A), et dissuasion nucléaire aéroportée au sein des FAS.</p>
+                            <p><strong>Escadrons majeurs :</strong> EC 1/4 Gascogne, EC 2/4 La Fayette (Saint-Dizier), EC 2/30 Normandie-Niemen, EC 3/30 Lorraine (Mont-de-Marsan).</p>
+                            <p><strong>Armement :</strong> Canon interne de 30 mm Nexter (2500 coups/min). Missiles air-air MICA (IR/EM) et METEOR (très longue portée). Bombes guidées laser/GPS AASM (Hammer) et GBU. Missile de croisière conventionnel SCALP-EG. Missile nucléaire ASMP-A.</p>
+                        </div>
+
+                        <!-- MIRAGE 2000 -->
+                        <div class="article-container" style="margin-bottom: 25px;">
+                            <img src="mirage.png" alt="Dassault Mirage 2000" class="article-image">
+                            <h3 class="article-title" style="margin-top: 0;">Dassault Mirage 2000 (D / 5F)</h3>
+                            <p><strong>Constructeur :</strong> Dassault Aviation | <strong>Prix unitaire :</strong> ~30 M€ (historique)</p>
+                            <p><strong>Caractéristiques :</strong> Chasseur monoréacteur doté d'une aile delta pure, réputé pour sa très grande agilité en combat tourbillonnant. Vitesse maximale : Mach 2,2 (2 300 km/h). Propulsion : 1 turboréacteur Snecma M53.</p>
+                            <p><strong>Missions :</strong> 
+                                <br>• <em>Mirage 2000-5F :</em> Défense aérienne pure, supériorité et interception.
+                                <br>• <em>Mirage 2000D :</em> Assaut conventionnel, appui feu rapproché (CAS) et frappe au sol tout temps à très basse altitude.
+                            </p>
+                            <p><strong>Escadrons majeurs :</strong> EC 1/2 Cigognes (Luxeuil-les-Bains - version 2000-5F), EC 1/3 Navarre, EC 2/3 Champagne, EC 3/3 Ardennes (Nancy-Ochey - version 2000D).</p>
+                            <p><strong>Armement :</strong> Canons de 30 mm (sur 2000-5F, nacelle canon externe sur 2000D). Missiles air-air MICA. Bombes guidées laser (GBU-12, GBU-49) et missiles de croisière SCALP-EG (sur 2000D).</p>
+                        </div>
+
+                        <!-- A330 MRTT PHÉNIX -->
+                        <div class="article-container" style="margin-bottom: 25px;">
+                            <img src="mrtt.png" alt="Airbus A330 MRTT Phénix" class="article-image">
+                            <h3 class="article-title" style="margin-top: 0;">Airbus A330 MRTT Phénix</h3>
+                            <p><strong>Constructeur :</strong> Airbus Defence and Space | <strong>Prix unitaire :</strong> ~200 à 240 M€</p>
+                            <p><strong>Caractéristiques :</strong> Avion ravitailleur stratégique et de transport lourd gros-porteur, dérivé direct de l'avion de ligne civil A330-200. Capacité d'emport de carburant maximale : 111 tonnes.</p>
+                            <p><strong>Missions :</strong> Ravitaillement en vol des chasseurs (essentiel pour la crédibilité des raids nucléaires des FAS ou des projections lointaines), transport de fret lourd et de personnels (jusqu'à 272 passagers), évacuation médicale stratégique de grande ampleur (grâce au kit de réanimation "Morphée").</p>
+                            <p><strong>Escadrons majeurs :</strong> ERVTS 1/31 Bretagne, ERV 4/31 Sologne (Istres-Le Tubé).</p>
+                            <p><strong>Armement :</strong> Aucun. Équipé d'une suite complète de contre-mesures électroniques, détecteurs de départ de missiles et leurres thermiques pour évoluer en zone contestée.</p>
+                        </div>
+
+                        <!-- A400M ATLAS -->
+                        <div class="article-container" style="margin-bottom: 25px;">
+                            <img src="a400m.png" alt="Airbus A400M Atlas" class="article-image">
+                            <h3 class="article-title" style="margin-top: 0;">Airbus A400M Atlas</h3>
+                            <p><strong>Constructeur :</strong> Airbus Defence and Space | <strong>Prix unitaire :</strong> ~130 à 150 M€</p>
+                            <p><strong>Caractéristiques :</strong> Avion de transport militaire quadriturbopropulseur à long rayon d'action. Ses hélices tournent en sens inverse sur chaque aile (concept <em>Down Between Engines</em>) pour optimiser l'aérodynamisme. Charge utile maximale : 37 tonnes. Capable de décoller et atterrir sur des pistes sommaires ou non préparées (terre, sable).</p>
+                            <p><strong>Missions :</strong> Transport tactique (intra-théâtre) et stratégique (inter-théâtre) de troupes et de matériels lourds (hélicoptères, blindés type VBCI), parachutage d'hommes et de fret à grande et basse altitude, évacuation sanitaire (Medevac), et ravitaillement en vol (notamment des hélicoptères).</p>
+                            <p><strong>Escadrons majeurs :</strong> ET 1/61 Touraine, ET 4/61 Béarn (Orléans-Bricy).</p>
+                            <p><strong>Armement :</strong> Aucun. Protégé par un système complet d'autoprotection (brouilleurs, détecteurs radar/laser et lance-leurres).</p>
+                        </div>
+
+                        <!-- CARACAL -->
+                        <div class="article-container">
+                            <img src="caracal.png" alt="Airbus Helicopters H225M Caracal" class="article-image">
+                            <h3 class="article-title" style="margin-top: 0;">Airbus Helicopters H225M Caracal</h3>
+                            <p><strong>Constructeur :</strong> Airbus Helicopters | <strong>Prix unitaire :</strong> ~30 à 35 M€</p>
+                            <p><strong>Caractéristiques :</strong> Hélicoptère de transport lourd militaire de la classe des 11 tonnes, doté d'un rotor principal à 5 pales. Équipé de blindages renforcés et d'une perche de ravitaillement en vol (capacité unique indispensable pour étendre son autonomie lors de raids lointains).</p>
+                            <p><strong>Missions :</strong> Recherche et sauvetage au combat (RESCO / CSAR) pour récupérer des équipages éjectés en zone ennemie, infiltration et exfiltration tactique de Commandos de l'Air ou de forces spéciales (COS) de jour comme de nuit, évacuation sanitaire d'urgence.</p>
+                            <p><strong>Escadrons majeurs :</strong> EH 1/67 Pyrénées (Cazaux).</p>
+                            <p><strong>Armement :</strong> Armement de sabord amovible comprenant 2 mitrailleuses légères MAG58 (7,62 mm) ou 2 mitrailleuses lourdes axiales M3M (12,7 mm). Possibilité d'intégrer des paniers de roquettes en fonction du niveau de menace.</p>
+                        </div>
+
+                    </div>
+
+                    <!-- 4. MISSIONS & EXERCICES -->
+                    <div id="aae-missions" class="sub-tab-content">
+                        <div class="article-container">
+                            <h3 class="article-title">Mission PÉGASE (Projection de Puissance)</h3>
+                            <p><strong>L'Acronyme :</strong> PÉGASE signifie <em>Projection d’un dispositif Échelonné pour Garantir l’Assistance et la Sécurité de nos Engagements</em>.</p>
+                            <p><strong>Le Concept (Moyens déployés) :</strong> C'est la mission vitrine de projection de puissance de l'Armée de l'Air et de l'Espace. Elle consiste à déployer un "dispositif de combat complet" à 20 000 km de la métropole en moins de 48h. Ce dispositif (appelé MORANE) s'appuie sur le triptyque de la puissance aérienne française : la chasse (Dassault Rafale), l'allonge stratégique (A330 MRTT Phénix) et le transport lourd (A400M Atlas).</p>
+                            <p><strong>L'Objectif Stratégique :</strong> La France est une nation résidente du Pacifique (Nouvelle-Calédonie, Polynésie française). Face à la montée des tensions régionales (affirmation de la puissance chinoise, tensions sur Taïwan), PÉGASE prouve à la fois notre capacité à défendre nos territoires ultramarins sans délai, et notre fiabilité envers nos alliés stratégiques dans la région.</p>
+                            
+                            <h4 style="color: var(--highlight-color); margin-top: 15px; margin-bottom: 5px;">Focus : PÉGASE 26 (L'édition record)</h4>
+                            <p><strong>Un format inédit :</strong> La mission Pégase 2026 a marqué un tournant par son ampleur. Le dispositif a mobilisé un nombre record d'aéronefs (une vingtaine de Rafale, des MRTT et A400M) déployés sur plusieurs axes simultanés vers la zone Indo-Pacifique.</p>
+                            <p><strong>Pays visités et exercices :</strong> Le détachement a réalisé des escales diplomatiques et tactiques de premier plan. La mission a participé à des exercices majeurs de très haute intensité (comme <em>Pitch Black</em> en Australie) et a mené des exercices bilatéraux avec des partenaires clés comme l'Inde, l'Indonésie, le Japon et Singapour.</p>
+                            <p><strong>La vitrine de l'export (Le "Club Rafale") :</strong> Pégase est aussi l'outil diplomatique suprême de l'industrie de défense française (la "Diplomatie du Rafale"). Lors de ses escales, l'AAE démontre les capacités de l'avion en conditions réelles à ses utilisateurs ou futurs acheteurs. La mission s'est particulièrement illustrée dans les pays du "Club Rafale" de la région : l'Inde (qui possède déjà 36 Rafale Air et a sélectionné le Rafale Marine), l'Indonésie (contrat pour 42 avions), ainsi qu'aux Émirats Arabes Unis et au Qatar lors des escales de transit.</p>
+
+                            <h3 class="article-title">Exercice POKER (Dissuasion Nucléaire)</h3>
+                            <p><strong>Le Concept :</strong> Entraînement grandeur nature des Forces Aériennes Stratégiques (FAS).</p>
+                            <p><strong>La Démonstration :</strong> Organisé 4 fois par an (souvent de nuit), Poker simule un raid nucléaire complet traversant la France. Les Rafale, escortés par d'autres chasseurs et soutenus par des MRTT, doivent pénétrer un espace aérien âprement défendu par des systèmes sol-air et d'autres avions (jouant la force d'opposition ou "Red Air").</p>
+                            <p><strong>L'Enjeu Stratégique :</strong> L'exercice s'achève par le tir (fictif) du missile à capacité nucléaire ASMP-A (et son futur successeur l'ASN4G). C'est le message de crédibilité absolu envoyé au monde : la composante aéroportée de la dissuasion française est prête à frapper à tout instant.</p>
+
+                            <h3 class="article-title">Exercice VOLFA (Guerre de Haute Intensité)</h3>
+                            <p><strong>Le Concept :</strong> Préparation au combat de haute intensité (interarmées, interalliés et multichamps).</p>
+                            <p><strong>La Démonstration :</strong> Organisé depuis la base aérienne de Mont-de-Marsan (CEAM), c'est l'exercice majeur de l'AAE. Comme l'a parfaitement illustré <strong>VOLFA 25</strong>, sa grande force réside dans sa dimension Multi-Milieux Multi-Champs (M2MC). Il intègre non seulement des aéronefs français et étrangers, mais se coordonne avec les autres armées (Terre, Marine) et intègre pleinement les nouveaux champs de conflictualité (cyber, espace, lutte informationnelle).</p>
+                            <p><strong>L'Enjeu Tactique :</strong> Préparer nos forces à l'entrée en premier (Entry Force) face à un ennemi à parité technologique. Il s'agit de s'entraîner à vaincre des défenses sol-air modernes (A2/AD) et un brouillage électronique massif en synchronisant parfaitement les effets de tous les alliés dans tous les milieux.</p>
+                        </div>
+                    </div>
+
+                </div>
 
                 <!-- ESM SAINT-CYR -->
                 <div id="esm" class="tab-content">
